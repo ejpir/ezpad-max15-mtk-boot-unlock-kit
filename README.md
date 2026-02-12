@@ -124,6 +124,11 @@ At minimum, restore:
   - `seccfg` readback remained `lock_state=0x4` (stock-locked) in this session
   - runtime orange/unlocked indicators came from boot-chain behavior
   - details: `docs/SECCFG_NOTES.md`
+- `v16` vs `v18`:
+  - `v18` is `v16` plus additional lock-state-force patches
+  - in testing, persistent lock state still resets to locked (likely secure-world/TEE re-assertion)
+  - therefore `v18` is kept experimental; `v16` remains baseline
+  - this does not prevent fastbootd-based flashing workflows used for custom-ROM setup
 - `lk_a` vs `lk_b`:
   - for normal boot while active slot is `a`, patching `lk_a` is sufficient
   - patching `lk_b` is still recommended for slot-switch/OTA safety

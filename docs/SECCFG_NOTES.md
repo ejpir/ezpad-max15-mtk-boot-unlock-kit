@@ -26,3 +26,25 @@ Runtime unlocked/orange behavior was achieved through LK/boot-chain behavior, wh
 ## Extra Patch Candidate
 
 `images/experimental/lk_*_patched_v18_lockfix*` also patches the two additional lock-restore callsites and lockstate getter path. It is provided for testing but is not marked fully confirmed in this bundle.
+
+## v16 vs v18
+
+- `v16`:
+  - AVB key replacement
+  - image-auth fail branch bypasses
+  - orange-state selector forcing
+  - selinux cmdline literal rewrite
+  - one lock-restore call skip (`0xC59C`)
+- `v18`:
+  - everything in `v16`, plus:
+  - two extra lock-restore caller skips (`0x6CD0`, `0x6F10`)
+  - forced lockstate getter path (`state=3`, success return)
+
+## Why v18 Is Not Baseline
+
+In testing, persistent lock metadata still returns to locked on disk (`seccfg` remains stock-locked). The most likely reason is secure-world lock handling (TEE) reasserting lock state outside the LK patch scope.
+
+Result:
+
+- `v18` is useful as an experiment but does not reliably make persistent lock state stick.
+- This does not block the practical workflow here: fastbootd/flash workflows still work for custom-ROM bring-up.
