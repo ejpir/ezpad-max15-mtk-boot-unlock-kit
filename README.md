@@ -1,0 +1,121 @@
+# EZpad Max15 Working Bundle (2026-02-11)
+
+Known-good bring-up bundle for `EZpad_Max15` (`MT8781/MT6789`).
+This is the curated set of images, scripts, and docs that produced a booting system with root.
+
+## Status Snapshot
+
+Validated on Wednesday, February 11, 2026:
+
+- Android boots with:
+  - patched `lk_a`/`lk_b`
+  - custom `vbmeta_a`
+  - patched `vendor_boot_a` (fstab AVB/verify flags stripped)
+- Root works:
+  - `adb shell su -c id` returned `uid=0(root)` and `context=u:r:magisk:s0`
+- Runtime boot state observed:
+  - `ro.boot.flash.locked=0`
+  - `ro.boot.verifiedbootstate=orange`
+  - fastboot reported `unlocked:yes`
+
+## What This Bundle Solves
+
+- Reproducible fix path for the boot panic path where init exited with `127`
+- Reproducible root path using a known Magisk-patched `boot` image
+- Safe rollback to stock core partitions
+
+## Prerequisites
+
+- `python3`
+- `mtk.py` from this repo
+- `fastboot` and `adb`
+- `magiskboot` (for rebuilding vendor boot from stock)
+- Device access to:
+  - BROM/DA mode for `mtk.py w ...`
+  - fastboot mode for `fastboot flash ...`
+
+## Bundle Layout
+
+- `images/working/`
+  - known-good images used in successful boot/root flow
+- `images/stock_restore/`
+  - stock backups for rollback
+- `images/experimental/`
+  - experimental LK lockstate patch set (`v18`), not baseline
+- `scripts/`
+  - patch/rebuild scripts and helper tooling
+- `docs/`
+  - focused playbooks and forensic notes
+- `manifests/`
+  - `SHA256SUMS.txt` and `FILE_SIZES.tsv`
+
+## Integrity Verification
+
+```bash
+cd working_bundle_20260211
+./scripts/verify_bundle.sh
+```
+
+Equivalent direct check:
+
+```bash
+shasum -a 256 -c manifests/SHA256SUMS.txt
+```
+
+## Fast Start
+
+Use these in order:
+
+1. Apply known-good images:
+  - `docs/WORKING_PLAYBOOK.md` (section: flash known-good boot chain)
+2. Flash rooted boot image (active slot):
+  - `docs/WORKING_PLAYBOOK.md` (section: flash rooted boot)
+3. Validate root:
+  - `adb shell su -c id`
+
+## Rebuilding the Vendor Boot 127 Fix
+
+This bundle includes a direct MagiskBoot reproducer:
+
+- Script: `scripts/rebuild_vendor_boot_noavb_magiskboot.sh`
+- Full details: `docs/MAGISKBOOT_VENDOR_BOOT_FIX.md`
+
+Example:
+
+```bash
+cd working_bundle_20260211
+./scripts/rebuild_vendor_boot_noavb_magiskboot.sh \
+  images/stock_restore/vendor_boot_a.bin \
+  images/working/vendor_boot_a_noavb_fstab.bin
+```
+
+## Rollback
+
+Rollback commands are documented in:
+
+- `docs/WORKING_PLAYBOOK.md` (stock restore section)
+
+At minimum, restore:
+
+- `images/stock_restore/lk_a.bin`
+- `images/stock_restore/lk_b.bin`
+- `images/stock_restore/vbmeta_a.bin`
+- `images/stock_restore/vendor_boot_a.bin`
+- `images/stock_restore/boot_a.bin`
+- `images/stock_restore/boot_b.bin`
+
+## Known Caveats
+
+- Persistent `seccfg` behavior:
+  - `seccfg` readback remained `lock_state=0x4` (stock-locked) in this session
+  - runtime orange/unlocked indicators came from boot-chain behavior
+  - details: `docs/SECCFG_NOTES.md`
+- `init_boot_a/bin` backups here are zero-filled placeholders on this device.
+  - patch `boot_*` for Magisk root, not `init_boot_*`
+- Never flash unrelated images into `boot_*` unless intentionally testing write path.
+
+## Recommended Operational Safety
+
+- Verify `current-slot` before flashing slot-specific partitions.
+- Keep a full backup of all stock images before trying experimental patches.
+- Re-run `./scripts/verify_bundle.sh` after moving/copying the bundle.
