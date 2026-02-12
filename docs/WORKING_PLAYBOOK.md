@@ -5,6 +5,10 @@ This playbook is the operational path used to bypass AVB and enable custom ROM b
 
 Base tooling upstream: https://github.com/bkerler/mtkclient
 
+If you want to regenerate images from stock with scripts first, use:
+
+- `docs/BUILD_FROM_SCRATCH.md`
+
 ## 0) Rebuild `vendor_boot_a` with MagiskBoot (127 Fix Reproducer)
 
 Use this when you want to regenerate the known `vendor_boot` fix from stock input.
@@ -25,9 +29,16 @@ The patched fstab copies are saved under:
 
 Prereq: device in BROM/DA mode for `mtk.py` writes.
 
+`lk_a_patched_v16_force_orange_allselectors_selinux_skiprestore.img` and
+`lk_b_patched_v16_force_orange_allselectors_selinux_skiprestore_from_lka.img`
+are byte-identical in this bundle. For clarity, flash the same LK payload to both slots:
+
+- If you are staying on slot `a` only, `lk_a` patch is enough to boot.
+- Patching both `lk_a` and `lk_b` is recommended for slot-switch resilience.
+
 ```bash
 python3 mtk.py w lk_a images/working/lk_a_patched_v16_force_orange_allselectors_selinux_skiprestore.img --preloader mtkclient/Loader/MTK_DA_V6.bin
-python3 mtk.py w lk_b images/working/lk_b_patched_v16_force_orange_allselectors_selinux_skiprestore_from_lka.img --preloader mtkclient/Loader/MTK_DA_V6.bin
+python3 mtk.py w lk_b images/working/lk_a_patched_v16_force_orange_allselectors_selinux_skiprestore.img --preloader mtkclient/Loader/MTK_DA_V6.bin
 python3 mtk.py w vbmeta_a images/working/vbmeta_a_custom_v2.img --preloader mtkclient/Loader/MTK_DA_V6.bin
 python3 mtk.py w vendor_boot_a images/working/vendor_boot_a_noavb_fstab.bin --preloader mtkclient/Loader/MTK_DA_V6.bin
 ```

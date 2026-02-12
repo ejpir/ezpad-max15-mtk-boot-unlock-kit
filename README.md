@@ -83,6 +83,10 @@ Use these in order:
 3. Validate root:
   - `adb shell su -c id`
 
+If you prefer generating images instead of using prebuilt files:
+
+- `docs/BUILD_FROM_SCRATCH.md`
+
 ## Rebuilding the Vendor Boot 127 Fix
 
 This bundle includes a direct MagiskBoot reproducer:
@@ -120,6 +124,9 @@ At minimum, restore:
   - `seccfg` readback remained `lock_state=0x4` (stock-locked) in this session
   - runtime orange/unlocked indicators came from boot-chain behavior
   - details: `docs/SECCFG_NOTES.md`
+- `lk_a` vs `lk_b`:
+  - for normal boot while active slot is `a`, patching `lk_a` is sufficient
+  - patching `lk_b` is still recommended for slot-switch/OTA safety
 - `init_boot_a/bin` backups here are zero-filled placeholders on this device.
   - patch `boot_*` for Magisk root, not `init_boot_*`
 - Never flash unrelated images into `boot_*` unless intentionally testing write path.
