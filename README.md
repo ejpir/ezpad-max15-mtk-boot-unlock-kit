@@ -34,6 +34,29 @@ Validated on Wednesday, February 11, 2026:
 - AVB bypass flow required to boot custom ROM stacks such as LineageOS 23.x
 - Safe rollback to stock core partitions
 
+## Technical Patch Matrix
+
+- `lk_a` / `lk_b` (`v16` baseline):
+  - Replaces embedded AVB public key with custom vbmeta key material.
+  - NOPs duplicated image-auth failure branches (`Image Auth Fail` path) so LK does not halt there.
+  - Forces verified-boot state selector to orange path.
+  - Rewrites selected LK cmdline literals to `androidboot.selinux=permissive`.
+  - Skips one lock-restore callsite in `boot_linux_fdt` (`0xC59C`).
+  - Purpose: keep early boot chain permissive enough for custom vbmeta and custom-ROM bring-up.
+- `vbmeta_a_custom_v2.img`:
+  - Keeps stock descriptor structure (not empty vbmeta).
+  - Uses custom AVB key and flags (`flags=3`).
+  - Purpose: satisfy boot chain expectations while allowing non-stock trust configuration.
+- `vendor_boot_a_noavb_fstab.bin`:
+  - First-stage fstab entries are patched to remove `avb`/`avb=*`/`verify*` fs_mgr flags.
+  - Purpose: avoid first-stage mount/exec path failures that produced init exit `127`.
+- `boot_*` (Magisk-patched image):
+  - Provides runtime root (`su`) on top of the working boot chain.
+  - Purpose: debugging, device bring-up, and custom ROM post-boot operations.
+- Stock partitions intentionally left stock in this flow:
+  - `super`, `vbmeta_system_a`, `vbmeta_vendor_a`, `boot_a` content base (before Magisk patch), `dtbo_a`, `init_boot_a`.
+  - Purpose: minimize moving parts and isolate changes to AVB/boot-chain gating.
+
 ## Prerequisites
 
 - `python3`
