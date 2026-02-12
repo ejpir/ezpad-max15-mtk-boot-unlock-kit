@@ -1,5 +1,10 @@
 # Working Playbook
 
+This playbook is the operational path used to bypass AVB and enable custom ROM boot
+(target use case: LineageOS 23.x on EZpad Max15).
+
+Base tooling upstream: https://github.com/bkerler/mtkclient
+
 ## 0) Rebuild `vendor_boot_a` with MagiskBoot (127 Fix Reproducer)
 
 Use this when you want to regenerate the known `vendor_boot` fix from stock input.

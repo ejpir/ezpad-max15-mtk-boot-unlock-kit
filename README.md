@@ -3,6 +3,15 @@
 Known-good bring-up bundle for `EZpad_Max15` (`MT8781/MT6789`).
 This is the curated set of images, scripts, and docs that produced a booting system with root.
 
+Primary objective: make it possible to boot custom ROMs (including LineageOS 23.x)
+by bypassing AVB enforcement in the LK/vbmeta/vendor_boot boot chain.
+
+## Upstream Base
+
+This work is built on top of the original `mtkclient` project:
+
+- https://github.com/bkerler/mtkclient
+
 ## Status Snapshot
 
 Validated on Wednesday, February 11, 2026:
@@ -22,6 +31,7 @@ Validated on Wednesday, February 11, 2026:
 
 - Reproducible fix path for the boot panic path where init exited with `127`
 - Reproducible root path using a known Magisk-patched `boot` image
+- AVB bypass flow required to boot custom ROM stacks such as LineageOS 23.x
 - Safe rollback to stock core partitions
 
 ## Prerequisites
