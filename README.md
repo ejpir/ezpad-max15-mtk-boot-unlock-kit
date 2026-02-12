@@ -1,4 +1,4 @@
-# EZpad Max15 Working Bundle (2026-02-11)
+# Jumper EZpad Max15 Working Bundle (2026-02-11)
 
 Known-good bring-up bundle for `EZpad_Max15` (`MT8781/MT6789`).
 This is the curated set of images, scripts, and docs that produced a booting system with root.
